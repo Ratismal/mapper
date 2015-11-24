@@ -12,11 +12,13 @@ using System.Windows.Forms;
 namespace mapper
 {
     
-    public partial class Form1 : Form
+    public partial class Mapper : Form
     {
-        Dictionary<Coord, Image> tiles = new Dictionary<Coord, Image>();
-        Image currentTile;
-        public Form1()
+        //Dictionary<int[], Image> tiles = new Dictionary<int[], Image>();
+        Tile currentTile;
+        TileMap tileMap;
+        
+        public Mapper()
         {
             InitializeComponent();
         }
@@ -47,20 +49,10 @@ namespace mapper
 
                 Console.WriteLine(xTileCount + " " + yTileCount);
 
-                tiles.Clear();
-                Coord temp;
+                Reference.palette = new Palette(xTileCount, yTileCount, map);
+                //tiles = new Image[xTileCount][];
 
-                for (int i = 0; i < xTileCount; i++)
-                {
-                    for (int ii = 0; ii < yTileCount; ii++)
-                    {
-                        temp = new Coord(i, ii);
-                        tiles.Add(temp, new Bitmap(32, 32));
-                        var graphics = Graphics.FromImage(tiles[temp]);
-                        graphics.DrawImage(map, new Rectangle(0, 0, 32, 32), new Rectangle(i * 32, ii * 32, 32, 32), GraphicsUnit.Pixel);
-                        graphics.Dispose();
-                    }
-                }
+                //tileMap = new Palette(xTileCount, yTileCount, map);
 
                 pictureBox1.SizeMode = PictureBoxSizeMode.AutoSize;
                 pictureBox1.Image = map;
@@ -71,19 +63,43 @@ namespace mapper
         {
             MouseEventArgs me = (MouseEventArgs)e;
             Point coord = me.Location;
-            Coord p = new Coord(coord.X / 32, coord.Y / 32);
-            Console.WriteLine("Was clicked at " + p.getX() + " " + p.getY());
+            //Coord p = new Coord(coord.X / 32, coord.Y / 32);
+            //Console.WriteLine("Was clicked at " + p.getX() + " " + p.getY());
 
             try {
-                currentTile = tiles[new Coord(coord.X / 32, coord.Y / 32)];
+                //currentTile = 
+                //currentTile = new Tile()
+                currentTile = new Tile(coord.X / 32, coord.Y / 32);
             }
             catch (Exception ee)
             {
                 
             }
+            pictureBox2.Image = currentTile.getImage();
 
-            pictureBox2.Image = currentTile;
+        }
 
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            New newForm = new New();
+            if (newForm.ShowDialog() == DialogResult.OK)
+            {
+                tileMap = new TileMap(newForm.height, newForm.width);
+                pictureBox3.Image = tileMap.getMap();
+            }
+            
+        }
+
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("Doing stuff");
+            MouseEventArgs me = (MouseEventArgs)e;
+            Point coord = me.Location;
+            Tile tempTile = currentTile;
+            tempTile.setX(coord.X / 32);
+            tempTile.setY(coord.Y / 32);
+            tileMap.addTile(tempTile);
+            pictureBox3.Image = tileMap.getMap();
         }
     }
 }
