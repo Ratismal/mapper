@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
 
 namespace mapper
 {
     [Serializable]
-    class Tile
+    class Prop
     {
         public int x { get; set; }
         public int y { get; set; }
@@ -16,7 +16,7 @@ namespace mapper
         public int texX { get; }
         public int texY { get; }
 
-        public Tile (int x, int y, int texX, int texY)
+        public Prop(int x, int y, int texX, int texY)
         {
             this.x = x;
             this.y = y;
@@ -24,7 +24,7 @@ namespace mapper
             this.texY = texY;
         }
 
-        public Tile (int texX, int texY)
+        public Prop(int texX, int texY)
         {
             this.texX = texX;
             this.texY = texY;
@@ -34,7 +34,5 @@ namespace mapper
         {
             return Reference.palette.GetTile(texX, texY);
         }
-
-        
     }
 }

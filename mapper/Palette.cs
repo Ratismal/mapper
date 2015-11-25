@@ -20,11 +20,11 @@ namespace mapper
             this.width = x;
             this.height = y;
             this.map = map;
-            init();
+            Init();
 
         }
 
-        private void init()
+        private void Init()
         {
             tiles = new Image[width][];
             for (int i = 0; i < width; i++)
@@ -40,9 +40,13 @@ namespace mapper
                     graphics.Dispose();
                 }
             }
+            
+            var g = Graphics.FromImage(tiles[0][0]);
+            g.Clear(Color.Transparent);
+            g.Dispose();
         }
 
-        public Image getTile(int x, int y)
+        public Image GetTile(int x, int y)
         {
             return tiles[x][y];
         }

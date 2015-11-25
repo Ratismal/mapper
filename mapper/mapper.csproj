@@ -52,6 +52,7 @@
     <Compile Include="New.Designer.cs">
       <DependentUpon>New.cs</DependentUpon>
     </Compile>
+    <Compile Include="Prop.cs" />
     <Compile Include="Palette.cs" />
     <Compile Include="Reference.cs" />
     <Compile Include="Tile.cs" />

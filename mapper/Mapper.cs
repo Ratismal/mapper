@@ -17,6 +17,8 @@ namespace mapper
         //Dictionary<int[], Image> tiles = new Dictionary<int[], Image>();
         Tile currentTile;
         TileMap tileMap;
+
+        public bool tileMode = true;
         
         public Mapper()
         {
@@ -33,9 +35,10 @@ namespace mapper
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "Palette|*.png";
             openFileDialog1.Title = "Select a Palette File";
+            
 
             Image map;
-
+            
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 // Assign the cursor in the Stream to the Form's Cursor property.
@@ -56,6 +59,10 @@ namespace mapper
 
                 pictureBox1.SizeMode = PictureBoxSizeMode.AutoSize;
                 pictureBox1.Image = map;
+                if (tileMap != null)
+                {
+                    pictureBox3.Image = tileMap.GetMap();
+                }
             }
         }
 
@@ -75,7 +82,7 @@ namespace mapper
             {
                 
             }
-            pictureBox2.Image = currentTile.getImage();
+            pictureBox2.Image = currentTile.GetImage();
 
         }
 
@@ -85,21 +92,109 @@ namespace mapper
             if (newForm.ShowDialog() == DialogResult.OK)
             {
                 tileMap = new TileMap(newForm.height, newForm.width);
-                pictureBox3.Image = tileMap.getMap();
+                pictureBox3.Image = tileMap.GetMap();
             }
             
         }
 
-        private void pictureBox3_Click(object sender, EventArgs e)
+        private void toolStripButton4_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Doing stuff");
-            MouseEventArgs me = (MouseEventArgs)e;
-            Point coord = me.Location;
-            Tile tempTile = currentTile;
-            tempTile.setX(coord.X / 32);
-            tempTile.setY(coord.Y / 32);
-            tileMap.addTile(tempTile);
-            pictureBox3.Image = tileMap.getMap();
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "Map|*.map";
+            saveFileDialog1.Title = "Save a map";
+            saveFileDialog1.ShowDialog();
+            if (saveFileDialog1.FileName != "")
+            {
+                System.IO.FileStream fs =
+                    (System.IO.FileStream)saveFileDialog1.OpenFile();
+                var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+
+                bformatter.Serialize(fs, tileMap);
+                fs.Close();
+            }
+        }
+
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "Map|*.map";
+            openFileDialog1.Title = "Select a Map File";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                System.IO.FileStream fs =
+                    (System.IO.FileStream)openFileDialog1.OpenFile();
+                var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+
+                tileMap = (TileMap)bformatter.Deserialize(fs);
+                fs.Close();
+                pictureBox3.Image = tileMap.GetMap();
+
+            }
+        }
+
+        bool _mousePressed;
+        private void PictureBox3MouseDown(object sender, MouseEventArgs e)
+        {
+            _mousePressed = true;
+            AddSomething(e);
+        }
+
+        private void PictureBox3MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_mousePressed)
+            {
+                AddSomething(e);
+
+            }
+        }
+
+        private void PictureBox3MouseUp(object sender, MouseEventArgs e)
+        {
+            _mousePressed = false;
+        }
+
+        private void AddSomething(MouseEventArgs e)
+        {
+            var me = (MouseEventArgs)e;
+            var coord = me.Location;
+            if (tileMode)
+            {
+                var tempTile = new Tile(currentTile.texX, currentTile.texY);
+                tempTile.x = coord.X/32;
+                tempTile.y = coord.Y/32;
+                tileMap.AddTile(tempTile);
+            }
+            else
+            {
+                var tempProp = new Prop(currentTile.texX, currentTile.texY);
+                tempProp.x = coord.X / 32;
+                tempProp.y = coord.Y / 32;
+                tileMap.AddProp(tempProp);
+            }
+            pictureBox3.Image = tileMap.GetMap();
+        }
+
+        private void toolStripButton5_Click(object sender, EventArgs e)
+        {
+            if (!tileMode)
+            {
+                tileMode = true;
+                toolStripButton5.BackColor = SystemColors.ControlDark;
+                toolStripButton6.BackColor = SystemColors.Control;
+            }
+        }
+
+        private void toolStripButton6_Click(object sender, EventArgs e)
+        {
+            if (tileMode)
+            {
+                tileMode = false;
+                toolStripButton5.BackColor = SystemColors.Control;
+                toolStripButton6.BackColor = SystemColors.ControlDark;
+            }
         }
     }
+
+    
 }
